@@ -17,6 +17,33 @@ rootProject.allprojects {
     }
 }
 
+def libsDir = "$projectDir/libs"
+def mobilertcAarUrl = 'https://www.dropbox.com/scl/fi/i6z0phdp86gs8ime6ukpw/mobilertc.aar?rlkey=xus19sp8ri2qf8qbvy2bxyrsv&st=zjtlm298&dl=1'
+def commonlibAarUrl = 'https://www.dropbox.com/scl/fi/6k9cesun5mwel3mjycsjm/commonlib.aar?rlkey=ouabvs6c9l4rw2sla7a8u2hur&st=hswpoizj&dl=1' // Replace with the actual URL
+
+def downloadFile = { url, file ->
+    if (!file.exists()) {
+        println "Downloading ${url}..."
+        new URL(url).withInputStream { i ->
+            file.withOutputStream { it << i }
+        }
+    } else {
+        println "${file.name} already exists, skipping download."
+    }
+}
+
+task downloadAars {
+    doLast {
+        def mobilertcFile = new File(libsDir, 'mobilertc.aar')
+        def commonlibFile = new File(libsDir, 'commonlib.aar')
+
+        downloadFile(mobilertcAarUrl, mobilertcFile)
+        downloadFile(commonlibAarUrl, commonlibFile)
+    }
+}
+
+preBuild.dependsOn(downloadAars)
+
 android {
     compileSdkVersion 34
 
